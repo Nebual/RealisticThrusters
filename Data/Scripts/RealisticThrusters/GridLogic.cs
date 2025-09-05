@@ -29,7 +29,7 @@ namespace Digi.RealisticThrusters
                     throw new Exception("given grid was null!");
 
                 Grid = grid;
-                RealismAmount = 1.0f;
+                RealismAmount = Settings.Instance.defaultRealisticAmount;
                 ForcedRealismAmount = null;
                 _lastCheckedOwner = -1;
 
@@ -147,9 +147,9 @@ namespace Digi.RealisticThrusters
                 if(ForcedRealismAmount != null)
                     RealismAmount = ForcedRealismAmount.Value;
                 else if(IsPlayerControlled())
-                    RealismAmount = 1.0f;
+                    RealismAmount = Settings.Instance.defaultRealisticAmount;
                 else
-                    RealismAmount = IsNPCOwned() ? 0.0f : 1.0f;
+                    RealismAmount = IsNPCOwned() ? 0.0f : Settings.Instance.defaultRealisticAmount;
 
                 // mode changed, apply it
                 if(prevRealism != RealismAmount)

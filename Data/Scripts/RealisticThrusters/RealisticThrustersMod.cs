@@ -7,11 +7,12 @@ using VRage.Collections;
 using VRage.Game.Components;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
+using Draygo.API;
 
 namespace Digi.RealisticThrusters
 {
     [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation)]
-    public class RealisticThrustersMod : MySessionComponentBase
+    public partial class RealisticThrustersMod : MySessionComponentBase
     {
         public const string CUSTOMDATA_FORCE_TAG = "force-realistic-thrust";
         public const string CUSTOMDATA_DISABLE_TAG = "disable-realistic-thrust";
@@ -29,6 +30,8 @@ namespace Digi.RealisticThrusters
         private int PlayersUpdateTick = 0;
         public readonly List<IMyPlayer> Players = new List<IMyPlayer>();
 
+        HudAPIv2 hudAPI;
+
         public override void LoadData()
         {
             Instance = this;
@@ -43,7 +46,13 @@ namespace Digi.RealisticThrusters
         {
             try
             {
-                if(MyAPIGateway.Session.IsServer)
+                InitConfig();
+                if (!MyAPIGateway.Utilities.IsDedicated)
+                {
+                    Log.Info("Initializing HUD API");
+                    hudAPI = new HudAPIv2(InitMenu);
+                }
+                if (MyAPIGateway.Session.IsServer)
                 {
                     int count = MyAPIGateway.Session.Factions.Factions.Count;
                     List<IMyFaction> npcFactions = new List<IMyFaction>(count);
@@ -83,6 +92,7 @@ namespace Digi.RealisticThrusters
             MyVisualScriptLogicProvider.PlayerConnected -= PlayersChanged;
             MyVisualScriptLogicProvider.PlayerDisconnected -= PlayersChanged;
             MyAPIGateway.Session.Factions.FactionEdited -= FactionEdited;
+            hudAPI?.Unload();
         }
 
         void EntityAdded(IMyEntity ent)
